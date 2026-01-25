@@ -83,20 +83,16 @@ pip install -e ".[dev]"
 To set up a development environment:
 
 ```bash
-# Clone the repository
 git clone https://github.com/MoCoMakers/sprime.git
 cd sprime
-
-# Create a virtual environment (recommended)
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install with development dependencies
+source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -e ".[dev]"
-
-# Run tests to verify installation
 pytest tests/
+pre-commit install        # optional: rebuild + stage pdoc_html on commit when .py changes
 ```
+
+See **[Development guide](docs/development.md)** for full setup, pre-commit, API docs, and CI.
 
 ## Quick Start
 
@@ -216,6 +212,7 @@ s_prime = profile.calculate_s_prime()
 
 ### Getting Started
 
+- **[API Reference](https://mocomakers.github.io/sprime/)** - API documentation (generated from docstrings)
 - **[Basic Usage Guide](docs/usage/basic_usage_guide.md)** - Comprehensive step-by-step guide to using sprime with your data, including advanced usage patterns and testing
 
 ### Core Concepts
@@ -226,6 +223,7 @@ s_prime = profile.calculate_s_prime()
 ### Technical Documentation
 
 - **[Hill Curve Fitting Configuration](docs/usage/hill_curve_fitting_configuration.md)** - Technical details on curve fitting parameters and configuration options
+- **[Development guide](docs/development.md)** - Dev setup, tests, pre-commit, API docs, CI (for contributors)
 
 ### Examples
 
@@ -251,6 +249,9 @@ Development dependencies are optional and only needed if you plan to contribute 
   - Generates code coverage reports to identify untested code
   - Used with: `pytest --cov=src/sprime --cov-report=html`
   - Helps ensure comprehensive test coverage during development
+
+- **pdoc3** - Generates API docs from docstrings into `pdoc_html/`
+- **pre-commit** - Optional; rebuilds `pdoc_html` before each commit when `.py` files change
 
 **Install development dependencies:**
 ```bash
@@ -281,6 +282,10 @@ pytest tests/test_integration.py
 
 See the [Basic Usage Guide](docs/usage/basic_usage_guide.md#running-the-test-suite) for more testing information.
 
+### API docs (pdoc_html)
+
+API docs live in `pdoc_html/` in the repo and are built from docstrings. The [API Reference](https://mocomakers.github.io/sprime/) on GitHub Pages is deployed from CI. Build locally: `python -m pdoc --html --output-dir pdoc_html --force sprime`. Optional: `pre-commit install` rebuilds and stages `pdoc_html` on commit when `.py` files change. See [Development guide](docs/development.md) for details.
+
 ## Project Status
 
 This project is currently in **active development** (Alpha status). Features and API may change.
@@ -309,11 +314,12 @@ Contributions are welcome! We appreciate your help in making sprime better.
 
 1. **Fork the repository** on GitHub
 2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Make your changes** and add tests if applicable
-4. **Run the test suite** to ensure everything passes (`pytest tests/`)
-5. **Commit your changes** (`git commit -m 'Add amazing feature'`)
-6. **Push to the branch** (`git push origin feature/amazing-feature`)
-7. **Open a Pull Request**
+3. **Set up dev environment** — venv, `pip install -e ".[dev]"`, `pytest tests/`, optionally `pre-commit install`. See [Development guide](docs/development.md).
+4. **Make your changes** and add tests if applicable
+5. **Run the test suite** — `pytest tests/`
+6. **Commit your changes** (`git commit -m 'Add amazing feature'`). If you use pre-commit, the pdoc hook will rebuild and stage `pdoc_html` when you change `.py` files.
+7. **Push to the branch** (`git push origin feature/amazing-feature`)
+8. **Open a Pull Request**
 
 ### Development Guidelines
 

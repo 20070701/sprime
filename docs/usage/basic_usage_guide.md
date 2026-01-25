@@ -348,7 +348,7 @@ from sprime import SPrime as sp
 
 # 1. Load data
 print("Loading data...")
-raw_data = sp.load("demo_data.csv")
+raw_data = sp.load("docs/usage/demo_data_s_prime.csv")
 print(f"Loaded {len(raw_data)} profiles")
 
 # 2. Process data (fit curves, calculate S')
