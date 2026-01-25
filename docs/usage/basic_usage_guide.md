@@ -27,9 +27,9 @@ The basic workflow in sprime is:
 ```python
 from sprime import SPrime as sp
 
-# Load and process data
-raw_data = sp.load("screening_data.csv")
-screening_data = sp.process(raw_data)
+# Load and process data (use your CSV, or download a sample from the README Quick Start)
+raw_data, _ = sp.load("your_data.csv")
+screening_data, _ = sp.process(raw_data)
 
 # Calculate delta S' for comparative analysis
 delta_results = screening_data.calculate_delta_s_prime(
@@ -74,20 +74,22 @@ If you already have fitted Hill curve parameters:
 
 Compound information (Compound Name, Drug ID, etc.) is automatically forward-filled. This means if you have multiple rows for the same compound (different cell lines), you only need to specify the compound information in the first row.
 
-See `reference.csv` for a template with all column headers.
+**Template files:** [template_raw.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/template_raw.csv) (raw), [template_precalc.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/template_precalc.csv) (pre-calculated). Your CSV must use the same headers.
 
 ## Loading Data
 
 ### From CSV File
 
+Use your own file path, or [download a sample](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/demo_data_delta.csv) (raw) / [demo_data_precalc.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/demo_data_precalc.csv) (pre-calculated), then load:
+
 ```python
 from sprime import SPrime as sp
 
-# Load data from CSV
-raw_data = sp.load("screening_data.csv")
+# You can download samples from the URLs above, then load your file.
+raw_data, _ = sp.load("your_data.csv")
 
 # Or specify an assay name
-raw_data = sp.load("screening_data.csv", assay_name="HTS001")
+raw_data, _ = sp.load("your_data.csv", assay_name="HTS001")
 ```
 
 ### Inspecting Loaded Data
@@ -149,11 +151,11 @@ Processing fits Hill curves (if needed) and calculates S' values:
 ```python
 from sprime import SPrime as sp
 
-# Load data
-raw_data = sp.load("screening_data.csv")
+# Load data (use your CSV, or download a sample from the README Quick Start)
+raw_data, _ = sp.load("your_data.csv")
 
 # Process: fit curves and calculate S'
-screening_data = sp.process(raw_data)
+screening_data, _ = sp.process(raw_data)
 
 # Access results
 for profile in screening_data.profiles:
@@ -166,7 +168,7 @@ When your CSV has **both** raw dose-response data (DATA*/CONC*) **and** pre-calc
 
 ```python
 # CSV has both raw DATA/CONC and AC50/Upper/Lower columns – allow overwrite
-screening_data = sp.process(raw_data, allow_overwrite_hill_coefficients=True)
+screening_data, _ = sp.process(raw_data, allow_overwrite_hill_coefficients=True)
 ```
 
 - **`allow_overwrite_hill_coefficients=False`** (default): Raise if we would overwrite pre-calc Hill params.
@@ -180,7 +182,7 @@ You can pass **curve-fitting** parameters (distinct from `allow_overwrite_hill_c
 
 ```python
 # Curve-fitting parameters (maxfev, initial_ec50, etc.)
-screening_data = sp.process(
+screening_data, _ = sp.process(
     raw_data,
     curve_direction="up",  # Force increasing curve
     maxfev=10000,          # Faster fitting
@@ -188,7 +190,7 @@ screening_data = sp.process(
 )
 
 # When CSV has both raw + pre-calc, allow overwrite and optionally pass fit params
-screening_data = sp.process(
+screening_data, _ = sp.process(
     raw_data,
     allow_overwrite_hill_coefficients=True,
     maxfev=10000
@@ -234,7 +236,7 @@ If processing fails for some profiles, you can handle errors gracefully:
 ```python
 from sprime import SPrime as sp
 
-raw_data = sp.load("screening_data.csv")
+raw_data, _ = sp.load("your_data.csv")
 screening_data = ScreeningDataset(assay=raw_data.assay)
 
 # Process profiles one at a time to handle errors
@@ -346,14 +348,14 @@ Here's a complete example using the demo data:
 ```python
 from sprime import SPrime as sp
 
-# 1. Load data
+# 1. Load data (use your CSV, or download docs/usage/demo_data_s_prime.csv from the repo)
 print("Loading data...")
-raw_data = sp.load("docs/usage/demo_data_s_prime.csv")
+raw_data, _ = sp.load("docs/usage/demo_data_s_prime.csv")
 print(f"Loaded {len(raw_data)} profiles")
 
 # 2. Process data (fit curves, calculate S')
 print("\nProcessing data (fitting curves, calculating S')...")
-screening_data = sp.process(raw_data)
+screening_data, _ = sp.process(raw_data)
 print("Processing complete!")
 
 # 3. Display S' values
@@ -463,7 +465,7 @@ Your CSV has **both** raw dose-response columns (Data0..DataN, Conc0..ConcN) **a
 **Fix:** Set `allow_overwrite_hill_coefficients=True` when you intend to refit from raw and overwrite pre-calc:
 
 ```python
-screening_data = sp.process(raw_data, allow_overwrite_hill_coefficients=True)
+screening_data, _ = sp.process(raw_data, allow_overwrite_hill_coefficients=True)
 # or
 results = get_s_prime_from_data(list_of_rows, allow_overwrite_hill_coefficients=True)
 ```
@@ -540,11 +542,11 @@ If you have data from multiple assays, process them separately:
 from sprime import SPrime as sp
 
 # Load and process each assay separately
-assay1_data = sp.load("assay1_data.csv", assay_name="HTS001")
-assay1_processed = sp.process(assay1_data)
+assay1_data, _ = sp.load("assay1_data.csv", assay_name="HTS001")
+assay1_processed, _ = sp.process(assay1_data)
 
-assay2_data = sp.load("assay2_data.csv", assay_name="HTS002")
-assay2_processed = sp.process(assay2_data)
+assay2_data, _ = sp.load("assay2_data.csv", assay_name="HTS002")
+assay2_processed, _ = sp.process(assay2_data)
 
 # Compare results across assays (be cautious - different conditions)
 for profile1 in assay1_processed.profiles:
@@ -596,7 +598,7 @@ If your data already has fitted parameters, you can skip curve fitting:
 from sprime import SPrime as sp, HillCurveParams
 
 # Load data with pre-calculated parameters
-raw_data = sp.load("data_with_params.csv")
+raw_data, _ = sp.load("data_with_params.csv")
 
 # Profiles will have hill_params set
 for profile in raw_data.profiles:
@@ -631,8 +633,8 @@ results = []
 for csv_file in data_dir.glob("*.csv"):
     print(f"Processing {csv_file.name}...")
     try:
-        raw_data = sp.load(csv_file)
-        screening_data = sp.process(raw_data)
+        raw_data, _ = sp.load(csv_file)
+        screening_data, _ = sp.process(raw_data)
         results.append({
             'file': csv_file.name,
             'assay': screening_data.assay.name,

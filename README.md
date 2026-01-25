@@ -96,41 +96,72 @@ See **[Development guide](docs/development.md)** for full setup, pre-commit, API
 
 ## Quick Start
 
-The basic workflow in sprime is:
+The basic workflow in sprime is: **Load** raw data from CSV → **Process** (fit curves, calculate S') → **Analyze** (e.g. delta S' for comparative analysis).
 
-1. **Load** raw data from CSV → `RawDataset`
-2. **Process** data (fit curves, calculate S') → `ScreeningDataset`
-3. **Analyze** using delta S' for comparative analysis
+**Two ways to use sprime:**
+
+| Path | Your data | Required columns | What sprime does |
+|------|-----------|------------------|------------------|
+| **A — Raw** | `CONC0`..N, `DATA0`..N (dose–response pairs) | `Cell_Line`, `Drug ID` or `NCGCID` | Fits Hill → EC50, Upper, Lower, Hill, r² → S' |
+| **B — Pre-calculated** | `AC50`, `Upper`, `Lower` (optional: Hill, r2, S') | `Cell_Line`, `Drug ID` or `NCGCID` | Uses params as-is, computes S' if needed |
+
+### Path A — Raw data
+
+**Sample file:** [demo_data_delta.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/demo_data_delta.csv)  
+**Template:** [template_raw.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/template_raw.csv) — match this format, or see [Required headings](#required-headings) below.
 
 ```python
 from sprime import SPrime as sp
 
-# Load raw screening data from CSV
-raw_data = sp.load("screening_data.csv")
-
-# Process: fit Hill curves and calculate S' values
-screening_data = sp.process(raw_data)
-
-# Export results as list of dictionaries
+# You can download the sample from the URL above, then load your local file.
+raw_data, _ = sp.load("demo_delta.csv")
+screening_data, _ = sp.process(raw_data)
 results = screening_data.to_dict_list()
 for profile in results:
     print(f"{profile['compound_name']} vs {profile['cell_line']}: S' = {profile['s_prime']:.2f}")
 ```
 
-## Usage Examples
+### Path B — Pre-calculated
 
-### Loading and Processing Screening Data
+**Sample file:** [demo_data_precalc.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/demo_data_precalc.csv)  
+**Template:** [template_precalc.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/template_precalc.csv)
 
 ```python
 from sprime import SPrime as sp
 
-# Load raw screening data from CSV
-raw_data = sp.load("screening_data.csv")
+# You can download the sample from the URL above, then load your local file.
+raw_data, _ = sp.load("demo_precalc.csv")
+screening_data, _ = sp.process(raw_data)
+results = screening_data.to_dict_list()
+for profile in results:
+    print(f"{profile['compound_name']} vs {profile['cell_line']}: S' = {profile['s_prime']:.2f}")
+```
 
-# Process: fit Hill curves and calculate S' values
-screening_data = sp.process(raw_data)
+### Required headings
 
-# Export results as list of dictionaries
+- **All paths:** `Cell_Line`; and either `Drug ID` or `NCGCID`.
+- **Path A (raw):** `DATA0`..`DATA N`, `CONC0`..`CONC N` (same N; exclude "Concentration Units").
+- **Path B (pre-calc):** `AC50` (or `ec50`), `Upper` (or `Infinity`), `Lower` (or `Zero`). Optional: `Hill`, `r2`, `S'`.
+
+Template files list the exact headers; your CSV should match those.
+
+### Next steps
+
+- **Format details:** [Basic Usage Guide](docs/usage/basic_usage_guide.md)
+- **Run all scenarios:** [Demo](docs/usage/demo.py)
+
+## Usage Examples
+
+### Loading and Processing Screening Data
+
+Use your own CSV, or [download a sample](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/demo_data_delta.csv) (raw) / [demo_data_precalc.csv](https://raw.githubusercontent.com/MoCoMakers/sprime/refs/heads/main/docs/usage/demo_data_precalc.csv) (pre-calculated), then load the local file:
+
+```python
+from sprime import SPrime as sp
+
+# You can download samples from the URLs above, then load your file.
+raw_data, _ = sp.load("your_data.csv")
+screening_data, _ = sp.process(raw_data)
 results = screening_data.to_dict_list()
 for profile in results:
     print(f"{profile['compound_name']} vs {profile['cell_line']}: S' = {profile['s_prime']:.2f}")
